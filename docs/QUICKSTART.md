@@ -39,10 +39,19 @@ sdmc:/3ds/asteria-ds/config.json
 
 ## Live Robot Use
 
-Place external runtime dependencies beside this repo, then start the daemon:
+Clone the external runtime dependencies into this repo root, then start the daemon:
+
+```powershell
+git clone https://github.com/touretzkyds/vex-aim-tools.git
+git clone https://github.com/touretzkyds/AIM_Websocket_Library.git
+```
+
+Then start Asteria:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\asteria\start_asteria.ps1 -BindHost 127.0.0.1
 ```
 
 Use `-BindHost 0.0.0.0` only when a trusted local network client needs mobile access.
+
+For handheld setup, use the paired public repo: [RedLynx101/asteria-ds](https://github.com/RedLynx101/asteria-ds).

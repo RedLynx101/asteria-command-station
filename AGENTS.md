@@ -20,6 +20,7 @@ You are working in the public Asteria Command Station repo.
 ## Repo Boundaries
 
 - Do not vendor OpenClaw, VEX AIM tooling, class labs, local virtual environments, or generated mobile secrets into this repo.
+- Treat `vex-aim-tools/` and `AIM_Websocket_Library/` as ignored external dependency checkouts, not source owned by this repo.
 - Keep generated runtime data out of Git unless it is a curated example under `asteria/artifacts/fsm/`.
 - Keep public docs rooted in relative links.
 - Update `wiki/` when behavior has been validated and the note will help future agents.
