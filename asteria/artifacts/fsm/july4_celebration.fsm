@@ -1,0 +1,37 @@
+from aim_fsm import *
+
+
+class July4Celebration(StateMachineProgram):
+    # A celebratory routine with spoken cues, a star-like path, and a red/white/blue LED finale.
+    # Intended as a creative example file; create/compile is safe offline, but running it is motionful.
+    $setup{
+    start: Say("Happy Fourth of July from Asteria")
+        =C=> Flash([
+            (vex.Color.RED, 0.18),
+            (vex.Color.WHITE, 0.18),
+            (vex.Color.BLUE, 0.18),
+            (vex.Color.TRANSPARENT, 0.10)
+        ], num_cycles=3)
+        =C=> Say("Drawing a star")
+        =C=> Turn(36)
+        =C=> Forward(140)
+        =C=> Turn(144)
+        =C=> Forward(140)
+        =C=> Turn(144)
+        =C=> Forward(140)
+        =C=> Turn(144)
+        =C=> Forward(140)
+        =C=> Turn(144)
+        =C=> Forward(140)
+        =C=> Say("Fireworks finale")
+        =C=> Flash([
+            ((vex.Color.RED, vex.Color.WHITE, vex.Color.BLUE, vex.Color.RED, vex.Color.WHITE, vex.Color.BLUE), 0.12),
+            ((vex.Color.BLUE, vex.Color.RED, vex.Color.WHITE, vex.Color.BLUE, vex.Color.RED, vex.Color.WHITE), 0.12),
+            ((vex.Color.WHITE, vex.Color.BLUE, vex.Color.RED, vex.Color.WHITE, vex.Color.BLUE, vex.Color.RED), 0.12),
+            (vex.Color.TRANSPARENT, 0.08)
+        ], num_cycles=5)
+        =C=> Turn(120)
+        =C=> Turn(120)
+        =C=> Turn(120)
+        =C=> Say("July Fourth celebration complete")
+    }

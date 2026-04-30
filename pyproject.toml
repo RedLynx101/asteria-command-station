@@ -1,0 +1,13 @@
+[project]
+name = "asteria-command-station"
+version = "0.1.0"
+description = "Host-side robotics command station, FSM workspace, mobile bridge, and agent operating surface for VEX AIM experiments."
+requires-python = ">=3.11"
+readme = "README.md"
+authors = [{ name = "Noah Hicks" }]
+
+[project.optional-dependencies]
+fastapi = ["fastapi>=0.111", "uvicorn>=0.30"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

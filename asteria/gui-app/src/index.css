@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Typography ───────────────────────────── */
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* ── Dark palette (default) ───────────────── */
+  --color-bg: #0a0f1a;
+  --color-bg-inset: #060b14;
+  --color-surface: #111827;
+  --color-surface-raised: #1e293b;
+  --color-surface-overlay: #1e293bdd;
+  --color-border: #1e293b;
+  --color-border-strong: #334155;
+
+  --color-primary: #f1f5f9;
+  --color-secondary: #94a3b8;
+  --color-tertiary: #64748b;
+  --color-muted: #475569;
+
+  --color-accent: #22d3ee;
+  --color-accent-strong: #06b6d4;
+  --color-accent-soft: #22d3ee18;
+  --color-accent-muted: #164e63;
+
+  --color-success: #34d399;
+  --color-success-soft: #34d39918;
+  --color-warning: #fbbf24;
+  --color-warning-soft: #fbbf2418;
+  --color-danger: #f87171;
+  --color-danger-soft: #f8717118;
+
+  --color-sidebar-bg: #0d1220;
+  --color-sidebar-hover: #ffffff0a;
+  --color-sidebar-active: #ffffff12;
+
+  /* ── Radii ────────────────────────────────── */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+}
+
+/* ── Light theme overrides ──────────────────── */
+.light {
+  --color-bg: #f0f6f5;
+  --color-bg-inset: #e8f0ef;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f7fbfb;
+  --color-surface-overlay: #ffffffee;
+  --color-border: #d5e7e5;
+  --color-border-strong: #b9d5d2;
+
+  --color-primary: #153331;
+  --color-secondary: #496867;
+  --color-tertiary: #698887;
+  --color-muted: #8ba5a4;
+
+  --color-accent: #0f827a;
+  --color-accent-strong: #0a6b64;
+  --color-accent-soft: #0f827a14;
+  --color-accent-muted: #d8f5f1;
+
+  --color-success: #2a9d68;
+  --color-success-soft: #e2f8ee;
+  --color-warning: #d4960a;
+  --color-warning-soft: #fff8e1;
+  --color-danger: #d85a65;
+  --color-danger-soft: #ffe8eb;
+
+  --color-sidebar-bg: #e8f0ef;
+  --color-sidebar-hover: #00000008;
+  --color-sidebar-active: #00000010;
+}
+
+/* ── Base resets ────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar styling ──────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-tertiary);
+}
+
+/* ── Focus ring ─────────────────────────────── */
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+/* ── Transitions ────────────────────────────── */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease !important;
+}
+
+/* ── CodeMirror overrides ───────────────────── */
+.cm-editor {
+  height: 100%;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.cm-editor .cm-scroller {
+  font-family: var(--font-mono);
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+/* ── Responsive: collapse sidebar on mobile ─── */
+@media (max-width: 768px) {
+  .sidebar-desktop-only {
+    display: none;
+  }
+}
+
+/* ── Sonner toast overrides ─────────────────── */
+[data-sonner-toaster] {
+  --normal-bg: var(--color-surface);
+  --normal-border: var(--color-border);
+  --normal-text: var(--color-primary);
+  font-family: var(--font-sans);
+}
+
+/* ── Connection pulse animation ─────────────── */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.status-pulse {
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+/* ── Glow effect for active controls ────────── */
+.glow-accent {
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.3), 0 0 40px rgba(34, 211, 238, 0.1);
+}
+
+.light .glow-accent {
+  box-shadow: 0 0 20px rgba(15, 130, 122, 0.2), 0 0 40px rgba(15, 130, 122, 0.08);
+}
+
+/* ── Agent status shimmer ───────────────────── */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}

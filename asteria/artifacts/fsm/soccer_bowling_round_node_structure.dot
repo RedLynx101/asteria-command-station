@@ -1,0 +1,213 @@
+digraph SoccerBowlingRound {
+  graph [
+    bgcolor="white"
+    compound=true
+    fontname="Segoe UI"
+    fontsize=20
+    label=<
+      <B>SoccerBowlingRound - Complete Node Structure</B><BR/>
+      <FONT POINT-SIZE="12">C = Completion, S = Success, F = Failure, T = Timer transition</FONT>
+    >
+    labelloc=t
+    newrank=true
+    nodesep=0.35
+    pad=0.25
+    rankdir=TB
+    ranksep=0.55
+    splines=true
+  ];
+
+  node [
+    color="#475569"
+    fillcolor="#f8fafc"
+    fontname="Segoe UI"
+    fontsize=12
+    margin="0.15,0.1"
+    shape=box
+    style="rounded,filled"
+  ];
+
+  edge [
+    arrowsize=0.8
+    color="#475569"
+    fontname="Segoe UI"
+    fontsize=11
+    penwidth=1.8
+  ];
+
+  subgraph cluster_main {
+    color="#cbd5e1";
+    fillcolor="#f8fafc";
+    fontname="Segoe UI Semibold";
+    fontsize=15;
+    label="Top-Level Program";
+    style="rounded,filled";
+
+    {
+      rank=same;
+      main_start [
+        fillcolor="#dbeafe"
+        label=<<B>start</B><BR/><FONT POINT-SIZE="10">Say("Starting bowling round")</FONT>>
+      ];
+      main_acquire_ball [
+        fillcolor="#ede9fe"
+        label=<<B>acquire_ball</B><BR/><FONT POINT-SIZE="10">AcquireSoccerBall()</FONT>>
+      ];
+      main_announce_shot [
+        fillcolor="#dbeafe"
+        label=<<B>announce_shot</B><BR/><FONT POINT-SIZE="10">Say("Ball acquired. Looking for AprilTag 0")</FONT>>
+      ];
+      main_take_shot [
+        fillcolor="#ede9fe"
+        label=<<B>take_shot</B><BR/><FONT POINT-SIZE="10">ShootHeldBallAtTag0()</FONT>>
+      ];
+      main_done [
+        fillcolor="#dcfce7"
+        label=<<B>done</B><BR/><FONT POINT-SIZE="10">Say("Bowling round complete")</FONT>>
+      ];
+      main_failed [
+        fillcolor="#fee2e2"
+        label=<<B>failed</B><BR/><FONT POINT-SIZE="10">Print("soccer_bowling_round failed")</FONT>>
+      ];
+    }
+
+    main_start -> main_acquire_ball [color="#059669" fontcolor="#059669" label="C"];
+    main_acquire_ball -> main_announce_shot [color="#059669" fontcolor="#059669" label="C"];
+    main_acquire_ball -> main_failed [color="#dc2626" fontcolor="#dc2626" label="F"];
+    main_announce_shot -> main_take_shot [color="#059669" fontcolor="#059669" label="C"];
+    main_take_shot -> main_done [color="#059669" fontcolor="#059669" label="C"];
+    main_take_shot -> main_failed [color="#dc2626" fontcolor="#dc2626" label="F"];
+  }
+
+  subgraph cluster_acquire {
+    color="#c4b5fd";
+    fillcolor="#f5f3ff";
+    fontname="Segoe UI Semibold";
+    fontsize=15;
+    label="AcquireSoccerBall() Expansion";
+    style="rounded,filled";
+
+    ab_search_ball [
+      fillcolor="#eef2ff"
+      label=<<B>search_ball</B><BR/><FONT POINT-SIZE="10">SearchForVisibleObject(BALL_SPEC, "soccer ball")</FONT>>
+    ];
+    ab_pickup_ball [
+      fillcolor="#eef2ff"
+      label=<<B>pickup_ball</B><BR/><FONT POINT-SIZE="10">PickUp(BALL_SPEC)</FONT>>
+    ];
+    ab_settle_after_pickup [
+      fillcolor="#fff7ed"
+      label=<<B>settle_after_pickup</B><BR/><FONT POINT-SIZE="10">StateNode()</FONT>>
+    ];
+    ab_verify_ball [
+      fillcolor="#eef2ff"
+      label=<<B>verify_ball</B><BR/><FONT POINT-SIZE="10">RequireHeldBall()</FONT>>
+    ];
+    ab_announce_missing_ball [
+      fillcolor="#fee2e2"
+      label=<<B>announce_missing_ball</B><BR/><FONT POINT-SIZE="10">Say("I could not find the soccer ball after a full circle")</FONT>>
+    ];
+    ab_announce_pickup_failed [
+      fillcolor="#fee2e2"
+      label=<<B>announce_pickup_failed</B><BR/><FONT POINT-SIZE="10">Say("I could not drive in and touch the soccer ball")</FONT>>
+    ];
+    ab_announce_verify_failed [
+      fillcolor="#fee2e2"
+      label=<<B>announce_verify_failed</B><BR/><FONT POINT-SIZE="10">Say("I touched the soccer ball but did not secure it")</FONT>>
+    ];
+    ab_parentcompletes [
+      fillcolor="#dcfce7"
+      label=<<B>parentcompletes1</B><BR/><FONT POINT-SIZE="10">ParentCompletes() return success</FONT>>
+      shape=ellipse
+    ];
+    ab_parentfails [
+      fillcolor="#fecaca"
+      label=<<B>parentfails1</B><BR/><FONT POINT-SIZE="10">ParentFails() return failure</FONT>>
+      shape=ellipse
+    ];
+
+    ab_search_ball -> ab_pickup_ball [color="#2563eb" fontcolor="#2563eb" label="S"];
+    ab_search_ball -> ab_announce_missing_ball [color="#dc2626" fontcolor="#dc2626" label="F"];
+    ab_pickup_ball -> ab_settle_after_pickup [color="#059669" fontcolor="#059669" label="C"];
+    ab_pickup_ball -> ab_announce_pickup_failed [color="#dc2626" fontcolor="#dc2626" label="F"];
+    ab_settle_after_pickup -> ab_verify_ball [color="#d97706" fontcolor="#d97706" label="T 0.4s"];
+    ab_verify_ball -> ab_parentcompletes [color="#2563eb" fontcolor="#2563eb" label="S"];
+    ab_verify_ball -> ab_announce_verify_failed [color="#dc2626" fontcolor="#dc2626" label="F"];
+    ab_announce_missing_ball -> ab_parentfails [color="#059669" fontcolor="#059669" label="C"];
+    ab_announce_pickup_failed -> ab_parentfails [color="#059669" fontcolor="#059669" label="C"];
+    ab_announce_verify_failed -> ab_parentfails [color="#059669" fontcolor="#059669" label="C"];
+  }
+
+  subgraph cluster_shoot {
+    color="#93c5fd";
+    fillcolor="#eff6ff";
+    fontname="Segoe UI Semibold";
+    fontsize=15;
+    label="ShootHeldBallAtTag0() Expansion";
+    style="rounded,filled";
+
+    sh_check_ball [
+      fillcolor="#eef2ff"
+      label=<<B>check_ball</B><BR/><FONT POINT-SIZE="10">RequireHeldBall()</FONT>>
+    ];
+    sh_search_tag [
+      fillcolor="#eef2ff"
+      label=<<B>search_tag</B><BR/><FONT POINT-SIZE="10">SearchForAprilTag0()</FONT>>
+    ];
+    sh_aim_tag [
+      fillcolor="#eef2ff"
+      label=<<B>aim_tag</B><BR/><FONT POINT-SIZE="10">TurnTowardAprilTag0IfNeeded(5.0)</FONT>>
+    ];
+    sh_settle_before_kick [
+      fillcolor="#fff7ed"
+      label=<<B>settle_before_kick</B><BR/><FONT POINT-SIZE="10">StateNode()</FONT>>
+    ];
+    sh_kick_ball [
+      fillcolor="#eef2ff"
+      label=<<B>kick_ball</B><BR/><FONT POINT-SIZE="10">Kick(vex.KickType.HARD)</FONT>>
+    ];
+    sh_announce_no_ball [
+      fillcolor="#fee2e2"
+      label=<<B>announce_no_ball</B><BR/><FONT POINT-SIZE="10">Say("I am not holding the soccer ball")</FONT>>
+    ];
+    sh_announce_missing_tag [
+      fillcolor="#fee2e2"
+      label=<<B>announce_missing_tag</B><BR/><FONT POINT-SIZE="10">Say("I could not find AprilTag 0 after a full circle")</FONT>>
+    ];
+    sh_announce_aim_failed [
+      fillcolor="#fee2e2"
+      label=<<B>announce_aim_failed</B><BR/><FONT POINT-SIZE="10">Say("I could not aim at AprilTag 0")</FONT>>
+    ];
+    sh_announce_kick_failed [
+      fillcolor="#fee2e2"
+      label=<<B>announce_kick_failed</B><BR/><FONT POINT-SIZE="10">Say("I could not kick the ball")</FONT>>
+    ];
+    sh_parentcompletes [
+      fillcolor="#dcfce7"
+      label=<<B>parentcompletes1</B><BR/><FONT POINT-SIZE="10">ParentCompletes() return success</FONT>>
+      shape=ellipse
+    ];
+    sh_parentfails [
+      fillcolor="#fecaca"
+      label=<<B>parentfails1</B><BR/><FONT POINT-SIZE="10">ParentFails() return failure</FONT>>
+      shape=ellipse
+    ];
+
+    sh_check_ball -> sh_search_tag [color="#2563eb" fontcolor="#2563eb" label="S"];
+    sh_check_ball -> sh_announce_no_ball [color="#dc2626" fontcolor="#dc2626" label="F"];
+    sh_search_tag -> sh_aim_tag [color="#2563eb" fontcolor="#2563eb" label="S"];
+    sh_search_tag -> sh_announce_missing_tag [color="#dc2626" fontcolor="#dc2626" label="F"];
+    sh_aim_tag -> sh_settle_before_kick [color="#059669" fontcolor="#059669" label="C"];
+    sh_aim_tag -> sh_announce_aim_failed [color="#dc2626" fontcolor="#dc2626" label="F"];
+    sh_settle_before_kick -> sh_kick_ball [color="#d97706" fontcolor="#d97706" label="T 0.2s"];
+    sh_kick_ball -> sh_parentcompletes [color="#059669" fontcolor="#059669" label="C"];
+    sh_kick_ball -> sh_announce_kick_failed [color="#dc2626" fontcolor="#dc2626" label="F"];
+    sh_announce_no_ball -> sh_parentfails [color="#059669" fontcolor="#059669" label="C"];
+    sh_announce_missing_tag -> sh_parentfails [color="#059669" fontcolor="#059669" label="C"];
+    sh_announce_aim_failed -> sh_parentfails [color="#059669" fontcolor="#059669" label="C"];
+    sh_announce_kick_failed -> sh_parentfails [color="#059669" fontcolor="#059669" label="C"];
+  }
+
+  main_acquire_ball -> ab_search_ball [style=invis weight=30];
+  main_take_shot -> sh_check_ball [style=invis weight=30];
+}

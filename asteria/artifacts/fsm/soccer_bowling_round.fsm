@@ -1,0 +1,22 @@
+from aim_fsm import *
+
+from soccer_search_nodes import AcquireSoccerBall, ShootHeldBallAtTag0
+
+
+class SoccerBowlingRound(StateMachineProgram):
+    $setup{
+    start: Say("Starting bowling round") =C=> acquire_ball
+
+    acquire_ball: AcquireSoccerBall()
+    acquire_ball =C=> announce_shot
+    acquire_ball =F=> failed
+
+    announce_shot: Say("Ball acquired. Looking for AprilTag 0") =C=> take_shot
+
+    take_shot: ShootHeldBallAtTag0()
+    take_shot =C=> done
+    take_shot =F=> failed
+
+    done: Say("Bowling round complete")
+    failed: Print("soccer_bowling_round failed")
+    }

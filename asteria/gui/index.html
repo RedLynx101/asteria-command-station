@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Asteria Command Station</title>
+  <link rel="icon" type="image/svg+xml" href="/gui/assets/icons/asteria-icon.svg">
+  <link rel="stylesheet" href="/gui/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-shell card">
+      <div class="brand-cluster">
+        <img class="brand-icon" src="/gui/assets/icons/asteria-icon.svg" alt="Asteria icon">
+        <div class="brand-copy">
+          <div class="eyebrow">Robot operations workspace</div>
+          <h1>Asteria Command Station</h1>
+          <p>Compact mission control for connection, motion, desk coordination, FSM work, vision, and diagnostics.</p>
+        </div>
+      </div>
+
+      <div class="shell-status" id="shell-status">
+        <div class="status-chip">
+          <span class="label">Runtime</span>
+          <strong id="summary-runtime">Unknown</strong>
+        </div>
+        <div class="status-chip">
+          <span class="label">Lease</span>
+          <strong id="summary-lease">Unclaimed</strong>
+        </div>
+        <div class="status-chip">
+          <span class="label">Robot host</span>
+          <strong id="summary-host">n/a</strong>
+        </div>
+        <div class="status-chip">
+          <span class="label">Battery</span>
+          <strong id="summary-battery">n/a</strong>
+        </div>
+        <div class="status-chip">
+          <span class="label">Active FSM</span>
+          <strong id="summary-fsm">Idle</strong>
+        </div>
+        <div class="status-chip">
+          <span class="label">Last action</span>
+          <strong id="summary-last-action">Waiting</strong>
+        </div>
+      </div>
+
+      <div class="shell-actions">
+        <button class="btn btn-primary" id="claim-lease-btn" data-action="claimLease">Claim Local Control</button>
+        <button class="btn" id="refresh-status-btn" data-action="refreshStatus">Refresh Status</button>
+        <div class="danger-cluster">
+          <button class="btn btn-danger" id="stop-all-btn" data-action="stopAll">Stop All</button>
+          <button class="btn btn-danger ghost" id="disconnect-btn" data-action="disconnect">Disconnect</button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tab-strip card" role="tablist" aria-label="Asteria command views">
+      <button class="tab-button" role="tab" aria-selected="true" data-tab="operations" data-testid="tab-operations">Operations</button>
+      <button class="tab-button" role="tab" aria-selected="false" data-tab="desk" data-testid="tab-desk">Desk</button>
+      <button class="tab-button" role="tab" aria-selected="false" data-tab="fsm" data-testid="tab-fsm">FSM</button>
+      <button class="tab-button" role="tab" aria-selected="false" data-tab="vision" data-testid="tab-vision">Vision</button>
+      <button class="tab-button" role="tab" aria-selected="false" data-tab="debug" data-testid="tab-debug">Debug</button>
+    </nav>
+
+    <main class="tab-panels">
+      <section class="tab-panel is-active" id="panel-operations" data-panel="operations" role="tabpanel" aria-labelledby="tab-operations">
+        <div class="grid grid-12">
+          <article class="card span-12 status-banner">
+            <div class="status-banner-text">
+              <div class="eyebrow">Mission status</div>
+              <h2 id="latest-feedback-title">Ready for operator input</h2>
+              <p id="latest-feedback-body">Asteria is waiting for the next daemon status refresh.</p>
+            </div>
+            <div class="feedback-tags" id="feedback-tags"></div>
+          </article>
+
+          <article class="card span-5">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Connection</div>
+                <h3>Robot session</h3>
+              </div>
+              <span class="pill" id="connection-state-pill">Unknown</span>
+            </div>
+
+            <div class="metrics-grid" id="connection-glance"></div>
+
+            <div class="stack tight">
+              <label>
+                <span>Active profile</span>
+                <select id="connection-profile-select"></select>
+              </label>
+              <label>
+                <span>Robot target / ID</span>
+                <input id="robot-host-input" type="text" placeholder="AIM-526BA018 or 10.0.0.114">
+              </label>
+              <label>
+                <span>Fallback hosts</span>
+                <input id="connection-fallbacks-input" type="text" placeholder="comma-separated fallbacks">
+              </label>
+              <div class="button-row wrap">
+                <button class="btn btn-primary" id="apply-connection-btn" data-action="applyConnection">Apply Target</button>
+                <button class="btn" id="save-profile-target-btn" data-action="saveProfileTarget">Save To Profile</button>
+                <button class="btn" id="clear-override-btn" data-action="clearOverride">Clear Override</button>
+                <button class="btn" id="connect-btn" data-action="connect">Connect</button>
+                <button class="btn" id="reconnect-btn" data-action="reconnect">Reconnect</button>
+                <button class="btn" id="diagnose-connection-btn" data-action="diagnoseConnection">Diagnose</button>
+                <button class="btn" id="release-lease-btn" data-action="releaseLease">Release Lease</button>
+              </div>
+            </div>
+
+            <p class="field-note">
+              Asteria accepts short AIM IDs, full AIM hostnames, campus wifi hostnames, or direct IPs. Apply or diagnose
+              before reconnecting if the target changed.
+            </p>
+          </article>
+
+          <article class="card span-4">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Direct control</div>
+                <h3>Motion + actions</h3>
+              </div>
+              <span class="pill accent">Lease-gated</span>
+            </div>
+
+            <div class="teleop-cluster">
+              <div class="dpad-grid">
+                <button class="pad-btn" data-action="moveForward" data-hold-control="moveForward" aria-label="Move forward">&#9650;</button>
+                <button class="pad-btn" data-action="turnLeft" data-hold-control="turnLeft" aria-label="Turn left">&#9664;</button>
+                <button class="pad-btn center" data-action="stopAll" aria-label="Stop all">&#9632;</button>
+                <button class="pad-btn" data-action="turnRight" data-hold-control="turnRight" aria-label="Turn right">&#9654;</button>
+                <button class="pad-btn" data-action="moveBackward" data-hold-control="moveBackward" aria-label="Move backward">&#9660;</button>
+              </div>
+
+              <div class="action-grid">
+                <button class="btn" data-action="strafeLeft" data-hold-control="strafeLeft">Strafe Left</button>
+                <button class="btn" data-action="strafeRight" data-hold-control="strafeRight">Strafe Right</button>
+                <button class="btn" data-action="kickSoft">Kick Soft</button>
+                <button class="btn" data-action="kickMedium">Kick Medium</button>
+                <button class="btn" data-action="kickHard">Kick Hard</button>
+                <button class="btn" data-action="captureImage">Capture Image</button>
+                <button class="btn" data-action="sendSay">Display Text</button>
+              </div>
+            </div>
+
+            <label class="toggle-row">
+              <input id="continuous-direct-toggle" type="checkbox">
+              <span>Continuous hold controls</span>
+              <small>Hold movement buttons to drive live. Release to stop without unloading the FSM.</small>
+            </label>
+
+            <div class="step-grid">
+              <label>
+                <span>Move mm</span>
+                <input id="move-distance-input" type="number" value="120">
+              </label>
+              <label>
+                <span>Strafe mm</span>
+                <input id="sideways-distance-input" type="number" value="120">
+              </label>
+              <label>
+                <span>Turn deg</span>
+                <input id="turn-angle-input" type="number" value="90">
+              </label>
+            </div>
+
+            <label>
+              <span>Screen text</span>
+              <input id="say-text-input" type="text" value="Asteria online">
+            </label>
+          </article>
+
+          <article class="card span-3 image-preview-card">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Latest capture</div>
+                <h3>Vision preview</h3>
+              </div>
+              <button class="btn small" data-tab-jump="vision">Open Vision</button>
+            </div>
+            <div class="image-frame small">
+              <img id="operations-latest-image" alt="Latest robot capture" hidden>
+              <div class="empty-image" id="operations-empty-image">No image yet</div>
+            </div>
+          </article>
+
+          <article class="card span-6">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Status</div>
+                <h3>Runtime strip</h3>
+              </div>
+            </div>
+            <div class="metrics-grid" id="operations-metrics"></div>
+          </article>
+
+          <article class="card span-6">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Latest result</div>
+                <h3>Command feedback</h3>
+              </div>
+              <span class="pill" id="latest-result-kind">INFO</span>
+            </div>
+            <div id="latest-result-card" class="result-card result-info">
+              <strong id="latest-result-title">No recent action</strong>
+              <p id="latest-result-message">Commands, safety notices, and generated file links will appear here.</p>
+              <div id="latest-result-links" class="inline-links"></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="panel-desk" data-panel="desk" role="tabpanel" aria-labelledby="tab-desk" hidden>
+        <div class="grid grid-12">
+          <article class="card span-5">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Desk</div>
+                <h3>Prompt + notes</h3>
+              </div>
+              <span class="pill accent" id="open-prompt-count">0 open</span>
+            </div>
+            <div class="stack">
+              <label>
+                <span>Prompt or note</span>
+                <textarea id="desk-input" rows="6" placeholder="Ask Asteria to inspect, move, explain, or act."></textarea>
+              </label>
+              <div class="button-row">
+                <button class="btn btn-primary" id="send-prompt-btn" data-action="sendPrompt">Send Prompt</button>
+                <button class="btn" id="send-note-btn" data-action="logNote">Log Note</button>
+                <button class="btn" id="refresh-activity-btn" data-action="refreshStatus">Refresh Feed</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="card span-7">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Prompt queue</div>
+                <h3>Unresolved first</h3>
+              </div>
+              <span class="pill" id="activity-count">0 events</span>
+            </div>
+            <div class="scroll-region tall" id="unresolved-prompts"></div>
+          </article>
+
+          <article class="card span-12">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Activity</div>
+                <h3>Recent feed</h3>
+              </div>
+            </div>
+            <div class="scroll-region tall" id="recent-activity"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="panel-fsm" data-panel="fsm" role="tabpanel" aria-labelledby="tab-fsm" hidden>
+        <div class="grid grid-12">
+          <article class="card span-12">
+            <div class="toolbar">
+              <div class="toolbar-group">
+                <label class="toolbar-field">
+                  <span>FSM name</span>
+                  <input id="fsm-name-input" type="text" value="asteria_demo" placeholder="asteria_demo">
+                </label>
+              </div>
+              <div class="toolbar-group">
+                <button class="btn" id="new-template-btn" data-action="newTemplate">New Template</button>
+                <button class="btn btn-primary" id="save-fsm-btn" data-action="saveFsm">Save</button>
+                <button class="btn" id="compile-fsm-btn" data-action="compileFsm">Compile</button>
+                <button class="btn" id="run-fsm-btn" data-action="runFsm">Run</button>
+                <button class="btn btn-danger ghost" id="unload-fsm-btn" data-action="unloadFsm">Unload Active</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="card span-3">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Files</div>
+                <h3>FSM browser</h3>
+              </div>
+            </div>
+            <div class="scroll-region tall" id="fsm-file-list"></div>
+          </article>
+
+          <article class="card span-6">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Editor</div>
+                <h3>State machine source</h3>
+              </div>
+              <span class="pill" id="fsm-editor-status">Idle</span>
+            </div>
+            <textarea id="fsm-editor" class="code-editor" spellcheck="false"></textarea>
+          </article>
+
+          <article class="card span-3">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Runtime</div>
+                <h3>FSM summary</h3>
+              </div>
+            </div>
+            <div class="stack" id="fsm-summary"></div>
+          </article>
+
+          <article class="card span-12">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Inject event</div>
+                <h3>Text + speech lane</h3>
+              </div>
+            </div>
+            <div class="button-row wrap">
+              <input id="fsm-event-input" type="text" placeholder="Event payload for the active FSM">
+              <button class="btn btn-primary" id="send-fsm-text-btn" data-action="sendFsmText">Send Text</button>
+              <button class="btn" id="send-fsm-speech-btn" data-action="sendFsmSpeech">Send Speech</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="panel-vision" data-panel="vision" role="tabpanel" aria-labelledby="tab-vision" hidden>
+        <div class="grid grid-12">
+          <article class="card span-8">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Vision</div>
+                <h3>Image viewer</h3>
+              </div>
+              <div class="button-row">
+                <button class="btn btn-primary" id="capture-image-vision-btn" data-action="captureImage">Capture</button>
+                <button class="btn" data-action="refreshStatus">Refresh</button>
+              </div>
+            </div>
+            <div class="image-frame large">
+              <img id="vision-image" alt="Robot camera frame" hidden>
+              <div class="empty-image" id="vision-empty-image">No captured image available</div>
+            </div>
+          </article>
+
+          <article class="card span-4">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Telemetry</div>
+                <h3>Snapshot</h3>
+              </div>
+            </div>
+            <div class="stack" id="vision-telemetry"></div>
+          </article>
+
+          <article class="card span-12 collapsible-card" data-panel="vision-log">
+            <button class="collapse-toggle" aria-expanded="false" data-collapse-target="vision-command-log" data-testid="collapse-command-log">
+              Recent command log
+            </button>
+            <div class="collapse-content" id="vision-command-log" hidden>
+              <div class="scroll-region tall" id="command-log"></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="panel-debug" data-panel="debug" role="tabpanel" aria-labelledby="tab-debug" hidden>
+        <div class="grid grid-12">
+          <article class="card span-12">
+            <div class="card-head">
+              <div>
+                <div class="eyebrow">Stop policy</div>
+                <h3>Emergency behavior</h3>
+              </div>
+            </div>
+            <div class="stack tight">
+              <label class="toggle-row">
+                <input id="debug-stop-fsm-checkbox" type="checkbox">
+                <span>Stop buttons unload the active FSM</span>
+              </label>
+              <p class="field-note" id="debug-stop-fsm-note">
+                Shell Stop All and the D-pad stop button also unload the current FSM before halting motion.
+              </p>
+            </div>
+          </article>
+
+          <article class="card span-12 collapsible-card">
+            <button class="collapse-toggle" aria-expanded="false" data-collapse-target="debug-connection-panel" data-testid="collapse-debug-connection">
+              Connection diagnostics
+            </button>
+            <div class="collapse-content" id="debug-connection-panel" hidden>
+              <pre id="debug-diagnostics"></pre>
+            </div>
+          </article>
+
+          <article class="card span-12 collapsible-card">
+            <button class="collapse-toggle" aria-expanded="false" data-collapse-target="debug-command-panel" data-testid="collapse-debug-command-log">
+              Command log
+            </button>
+            <div class="collapse-content" id="debug-command-panel" hidden>
+              <pre id="debug-command-log"></pre>
+            </div>
+          </article>
+
+          <article class="card span-12 collapsible-card">
+            <button class="collapse-toggle" aria-expanded="false" data-collapse-target="debug-status-panel" data-testid="collapse-debug-status-json">
+              Raw status JSON
+            </button>
+            <div class="collapse-content" id="debug-status-panel" hidden>
+              <pre id="debug-status-json"></pre>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <template id="mini-card-template">
+    <article class="mini-card">
+      <div class="mini-card-head">
+        <strong class="mini-title"></strong>
+        <span class="mini-meta"></span>
+      </div>
+      <p class="mini-body"></p>
+    </article>
+  </template>
+
+  <script type="module" src="/gui/app.js"></script>
+</body>
+</html>

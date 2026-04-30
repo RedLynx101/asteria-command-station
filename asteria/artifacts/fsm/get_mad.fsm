@@ -1,0 +1,16 @@
+from aim_fsm import *
+
+from asteria_demo_nodes import ChargeAndKickBarrel
+
+
+class GetMad(StateMachineProgram):
+    $setup{
+    start: Say("I am getting mad") =C=> get_mad
+
+    get_mad: ChargeAndKickBarrel()
+    get_mad =C=> done
+    get_mad =F=> failed
+
+    done: Say("I feel better now")
+    failed: Print("get_mad failed")
+    }

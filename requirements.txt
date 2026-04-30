@@ -1,0 +1,4 @@
+# The stdlib daemon and CLI run without third-party Python packages.
+# Install these only if you use the optional FastAPI router module.
+fastapi>=0.111
+uvicorn>=0.30

@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env-win/
+
+# Node / GUI
+asteria/gui-app/node_modules/
+asteria/gui-app/dist/
+asteria/gui-app/.vite/
+npm-debug.log*
+
+# Runtime outputs and private local state
+asteria/artifacts/desk/*
+!asteria/artifacts/desk/.gitkeep
+asteria/artifacts/images/*
+!asteria/artifacts/images/.gitkeep
+asteria/artifacts/mobile-config/*
+!asteria/artifacts/mobile-config/.gitkeep
+asteria/artifacts/mobile-previews/*
+!asteria/artifacts/mobile-previews/.gitkeep
+asteria/artifacts/mobile-sessions/*
+!asteria/artifacts/mobile-sessions/.gitkeep
+asteria/artifacts/runs/*
+!asteria/artifacts/runs/.gitkeep
+asteria/artifacts/error-log.jsonl
+*.log
+
+# External local dependencies
+vex-aim-tools/
+AIM_Websocket_Library/
+robot-env/
+.openclaw/
+openclaw/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

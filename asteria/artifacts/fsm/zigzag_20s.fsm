@@ -1,0 +1,24 @@
+from aim_fsm import *
+
+
+class Zigzag20s(StateMachineProgram):
+    # Approximate 20-second zigzag. Actual runtime depends on drivetrain speed,
+    # floor traction, and the current AIM runtime timing.
+    $setup{
+    start: Say("Starting zigzag run")
+        =C=> Forward(160)
+        =C=> Turn(28)
+        =C=> Forward(160)
+        =C=> Turn(-56)
+        =C=> Forward(160)
+        =C=> Turn(56)
+        =C=> Forward(160)
+        =C=> Turn(-56)
+        =C=> Forward(160)
+        =C=> Turn(56)
+        =C=> Forward(160)
+        =C=> Turn(-56)
+        =C=> Forward(160)
+        =C=> Turn(28)
+        =C=> Say("I'm done now")
+    }

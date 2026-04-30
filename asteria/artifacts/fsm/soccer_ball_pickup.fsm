@@ -1,0 +1,16 @@
+from aim_fsm import *
+
+from soccer_search_nodes import AcquireSoccerBall
+
+
+class SoccerBallPickup(StateMachineProgram):
+    $setup{
+    start: Say("Starting soccer ball pickup") =C=> acquire_ball
+
+    acquire_ball: AcquireSoccerBall()
+    acquire_ball =C=> done
+    acquire_ball =F=> failed
+
+    done: Say("Soccer ball acquired")
+    failed: Print("soccer_ball_pickup failed")
+    }

@@ -1,0 +1,7 @@
+from aim_fsm import *
+
+
+class OpenclawProbe(StateMachineProgram):
+    $setup{
+    Say("openclaw_probe ready") =C=> Forward(12) =C=> Turn(9) =C=> Say("openclaw_probe complete")
+    }

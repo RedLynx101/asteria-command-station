@@ -1,0 +1,9 @@
+# Local operator/agent memory. Keep out of version control.
+MEMORY.md
+artifacts/images/*
+!artifacts/images/.gitkeep
+artifacts/runs/*
+!artifacts/runs/.gitkeep
+artifacts/gui-tests/node_modules/
+artifacts/gui-tests/test-results/
+artifacts/gui-tests/*.png

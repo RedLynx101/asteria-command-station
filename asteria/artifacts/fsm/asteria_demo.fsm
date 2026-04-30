@@ -1,0 +1,7 @@
+from aim_fsm import *
+
+
+class AsteriaDemo(StateMachineProgram):
+ $setup{
+ Say("asteria_demo ready") =C=> Forward(10) =C=> Turn(10) =C=> Say("asteria_demo complete")
+ }

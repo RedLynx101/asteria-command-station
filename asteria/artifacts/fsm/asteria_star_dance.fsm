@@ -1,0 +1,27 @@
+from aim_fsm import *
+
+
+class AsteriaStarDance(StateMachineProgram):
+    # A compact performance FSM that draws a star-like path with a dramatic intro and finale.
+    # Uses only Say, Forward, and Turn primitives that are already validated in this workspace.
+    $setup{
+    start: Say("Initiating Asteria star dance")
+        =C=> Turn(36)
+        =C=> Forward(180)
+        =C=> Turn(144)
+        =C=> Forward(180)
+        =C=> Turn(144)
+        =C=> Forward(180)
+        =C=> Turn(144)
+        =C=> Forward(180)
+        =C=> Turn(144)
+        =C=> Forward(180)
+        =C=> Say("Star traced")
+        =C=> Turn(120)
+        =C=> Turn(120)
+        =C=> Turn(120)
+        =C=> Say("Finale")
+        =C=> Turn(180)
+        =C=> Turn(180)
+        =C=> Say("Asteria star dance complete")
+    }

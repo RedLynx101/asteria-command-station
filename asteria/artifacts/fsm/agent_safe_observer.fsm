@@ -1,0 +1,12 @@
+from aim_fsm import *
+
+
+class AgentSafeObserver(StateMachineProgram):
+    $setup{
+    start: Say("agent safe observer ready") =C=> idle
+    idle: StateNode()
+    idle =TM=> got_text
+    idle =Hear=> got_speech
+    got_text: Say("observer text acknowledged") =C=> idle
+    got_speech: Say("observer speech acknowledged") =C=> idle
+    }

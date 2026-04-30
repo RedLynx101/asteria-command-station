@@ -1,0 +1,14 @@
+from aim_fsm import *
+
+from asteria_demo_nodes import FollowAnyAprilTag
+
+
+class FollowMeTag(StateMachineProgram):
+    $setup{
+    start: Say("Starting follow me tag") =C=> follow_tag
+
+    follow_tag: FollowAnyAprilTag()
+    follow_tag =F=> failed
+
+    failed: Print("follow_me_tag failed")
+    }

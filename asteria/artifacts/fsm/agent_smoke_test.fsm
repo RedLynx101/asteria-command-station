@@ -1,0 +1,12 @@
+from aim_fsm import *
+
+
+class AgentSmokeTest(StateMachineProgram):
+    $setup{
+    start: Say("agent smoke ready") =C=> idle
+    idle: StateNode()
+    idle =TM=> got_text
+    idle =Hear=> got_speech
+    got_text: Say("text event received") =C=> idle
+    got_speech: Say("speech event received") =C=> idle
+    }

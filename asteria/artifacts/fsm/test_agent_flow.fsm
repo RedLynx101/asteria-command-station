@@ -1,0 +1,7 @@
+from aim_fsm import *
+
+
+class TestAgentFlow(StateMachineProgram):
+    $setup{
+    Say("test_agent_flow ready") =C=> Forward(12) =C=> Turn(9) =C=> Say("test_agent_flow complete")
+    }

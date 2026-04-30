@@ -1,0 +1,9 @@
+from aim_fsm import *
+
+
+class Circle10cm(StateMachineProgram):
+    # Approximates a 10 cm radius circle with a 12-sided polygon.
+    # Chord length ~= 2 * r * sin(pi / 12) = 51.8 mm, rounded to 52 mm.
+    $setup{
+    start: Say("circle_10cm ready") =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Forward(52) =C=> Turn(30) =C=> Say("circle_10cm complete")
+    }

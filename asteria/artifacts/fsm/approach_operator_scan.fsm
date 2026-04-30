@@ -1,0 +1,21 @@
+from aim_fsm import *
+
+from asteria_demo_nodes import ApproachSpecificAprilTag
+
+
+# Current default uses AprilTag-0 as the operator-marker stand-in because that is
+# the most validated live AprilTag surface in this workspace today.
+OPERATOR_TAG_ID = 0
+
+
+class ApproachOperatorScan(StateMachineProgram):
+    $setup{
+    start: Say("Looking for the operator tag") =C=> approach_operator
+
+    approach_operator: ApproachSpecificAprilTag(OPERATOR_TAG_ID, label="the operator tag")
+    approach_operator =C=> done
+    approach_operator =F=> failed
+
+    done: Say("I am in operator range")
+    failed: Print("approach_operator_scan failed")
+    }

@@ -1,0 +1,17 @@
+from aim_fsm import *
+
+from asteria_demo_nodes import GalleryStop
+
+
+class TagGalleryTour(StateMachineProgram):
+    $setup{
+    start: Say("Starting tag gallery tour") =C=> tag_zero
+
+    tag_zero: GalleryStop(0) =C=> tag_one
+    tag_one: GalleryStop(1) =C=> tag_two
+    tag_two: GalleryStop(2) =C=> tag_three
+    tag_three: GalleryStop(3) =C=> tag_four
+    tag_four: GalleryStop(4) =C=> done
+
+    done: Say("Tag gallery tour complete")
+    }
