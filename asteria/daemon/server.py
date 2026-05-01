@@ -9,6 +9,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
+from asteria.daemon.common import env_bool
 from asteria.daemon.runtime import AsteriaRuntime
 from asteria.mobile.auth import load_auth_config
 from asteria.mobile.bridge import MobileBridgeService
@@ -20,6 +21,7 @@ _MOBILE_SERVICE: MobileBridgeService | None = None
 _MOBILE_SERVICE_MTIME: float | None = None
 
 _GUI_APP_DIST = RUNTIME.paths.asteria_root / "gui-app" / "dist"
+_PUBLIC_ARTIFACT_SUFFIXES = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 
 
 def resolve_mobile_service() -> tuple[MobileBridgeService | None, str | None]:
@@ -68,6 +70,12 @@ class AsteriaHandler(BaseHTTPRequestHandler):
         body = json.dumps(payload, indent=2, sort_keys=True).encode("utf-8")
         self._send_bytes(body, "application/json", status_code)
 
+    def _write_exception(self, exc: Exception, status_code: int = 500) -> None:
+        payload = {"ok": False, "error": str(exc)}
+        if env_bool("ASTERIA_DEBUG_TRACEBACKS", False):
+            payload["traceback"] = traceback.format_exc()
+        self._write_json(payload, status_code)
+
     def _write_file(self, target: Path) -> None:
         content = target.read_bytes()
         mime, _ = mimetypes.guess_type(target.name)
@@ -78,9 +86,14 @@ class AsteriaHandler(BaseHTTPRequestHandler):
 
         # Prefer the React app build output (gui-app/dist) if it exists.
         if _GUI_APP_DIST.is_dir():
-            candidate = (_GUI_APP_DIST / decoded_path).resolve()
-            dist_resolved = str(_GUI_APP_DIST.resolve())
-            if str(candidate).startswith(dist_resolved) and candidate.exists():
+            dist_root = _GUI_APP_DIST.resolve()
+            candidate = (dist_root / decoded_path).resolve()
+            try:
+                candidate.relative_to(dist_root)
+            except ValueError:
+                self._write_json({"ok": False, "error": "not found"}, 404)
+                return
+            if candidate.exists() and candidate.is_file():
                 self._write_file(candidate)
                 return
             # SPA fallback: unknown paths serve index.html for client-side routing.
@@ -90,16 +103,41 @@ class AsteriaHandler(BaseHTTPRequestHandler):
                 return
 
         # Fall back to the legacy vanilla GUI.
-        target = (RUNTIME.paths.gui_root / decoded_path).resolve()
-        if not str(target).startswith(str(RUNTIME.paths.gui_root.resolve())) or not target.exists():
+        gui_root = RUNTIME.paths.gui_root.resolve()
+        target = (gui_root / decoded_path).resolve()
+        try:
+            target.relative_to(gui_root)
+        except ValueError:
+            self._write_json({"ok": False, "error": "not found"}, 404)
+            return
+        if not target.exists() or not target.is_file():
             self._write_json({"ok": False, "error": "not found"}, 404)
             return
         self._write_file(target)
 
     def _serve_artifact(self, relative_path: str) -> None:
         decoded_path = unquote(relative_path.lstrip("/"))
-        target = (RUNTIME.paths.asteria_root / decoded_path).resolve()
-        if not str(target).startswith(str(RUNTIME.paths.asteria_root.resolve())) or not target.exists():
+        if decoded_path == "artifacts":
+            decoded_path = ""
+        elif decoded_path.startswith("artifacts/"):
+            decoded_path = decoded_path.removeprefix("artifacts/")
+
+        artifacts_root = RUNTIME.paths.artifacts_root.resolve()
+        target = (artifacts_root / decoded_path).resolve()
+        try:
+            target.relative_to(artifacts_root)
+        except ValueError:
+            self._write_json({"ok": False, "error": "not found"}, 404)
+            return
+        if not target.exists() or not target.is_file():
+            self._write_json({"ok": False, "error": "not found"}, 404)
+            return
+        try:
+            target.relative_to(RUNTIME.paths.image_root.resolve())
+        except ValueError:
+            self._write_json({"ok": False, "error": "not found"}, 404)
+            return
+        if target.suffix.lower() not in _PUBLIC_ARTIFACT_SUFFIXES:
             self._write_json({"ok": False, "error": "not found"}, 404)
             return
         self._write_file(target)
@@ -161,7 +199,7 @@ class AsteriaHandler(BaseHTTPRequestHandler):
             self._write_json({"ok": False, "error": "not found"}, 404)
             return True
         except Exception as exc:
-            self._write_json({"ok": False, "error": str(exc), "traceback": traceback.format_exc()}, 500)
+            self._write_exception(exc)
             return True
 
     def _handle_mobile_post(self, parsed, payload: dict) -> bool:
@@ -212,7 +250,7 @@ class AsteriaHandler(BaseHTTPRequestHandler):
             self._write_json({"ok": False, "error": "not found"}, 404)
             return True
         except Exception as exc:
-            self._write_json({"ok": False, "error": str(exc), "traceback": traceback.format_exc()}, 500)
+            self._write_exception(exc)
             return True
 
     def do_GET(self) -> None:  # noqa: N802
@@ -288,12 +326,12 @@ class AsteriaHandler(BaseHTTPRequestHandler):
                 return
             self._write_json({"ok": False, "error": "not found"}, 404)
         except Exception as exc:
-            self._write_json({"ok": False, "error": str(exc), "traceback": traceback.format_exc()}, 500)
+            self._write_exception(exc)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the Asteria command station daemon.")
-    parser.add_argument("--host", default="0.0.0.0", help="Bind host. Use 127.0.0.1 for local-only access.")
+    parser.add_argument("--host", default="127.0.0.1", help="Bind host. Use 0.0.0.0 only on a trusted LAN.")
     parser.add_argument("--port", type=int, default=8766, help="Local bind port.")
     args = parser.parse_args(argv)
 

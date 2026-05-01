@@ -456,7 +456,13 @@ function valueBox(label, value, severity = "") {
   if (severity) {
     node.dataset.severity = severity;
   }
-  node.innerHTML = `<div class="metric-label">${label}</div><div class="metric-value">${value}</div>`;
+  const labelNode = document.createElement("div");
+  labelNode.className = "metric-label";
+  labelNode.textContent = label;
+  const valueNode = document.createElement("div");
+  valueNode.className = "metric-value";
+  valueNode.textContent = value;
+  node.replaceChildren(labelNode, valueNode);
   return node;
 }
 

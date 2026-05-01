@@ -28,7 +28,7 @@ Handheld clients do not talk to a separate mobile app server. They call `/api/mo
 ### Desktop operator surface
 
 - source: `asteria/gui-app/` preferred, `asteria/gui/` legacy fallback
-- transport: same-origin browser calls to `/api/status`, `/api/command`, lease routes, and artifact URLs
+- transport: same-origin browser calls to `/api/status`, `/api/command`, lease routes, and captured image artifact URLs
 - purpose: primary local operator console
 
 ### Mobile / handheld surface

@@ -2,7 +2,7 @@ param(
     [ValidateSet("home", "cmu")]
     [string]$Profile,
     [switch]$OpenBrowser,
-    [string]$BindHost = "0.0.0.0"
+    [string]$BindHost = "127.0.0.1"
 )
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
@@ -23,6 +23,10 @@ if ($existing) {
         Start-Process "http://127.0.0.1:8766/"
     }
     return
+}
+
+if ($BindHost -eq "0.0.0.0") {
+    Write-Warning "Asteria will listen on all network interfaces. Use this only on a trusted LAN."
 }
 
 if ((Test-Path $preferredPython) -and (Test-Path $activateScript)) {
