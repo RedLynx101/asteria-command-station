@@ -4,6 +4,12 @@ Asteria is a host-side command station for VEX AIM robotics work. It combines a 
 
 ![Asteria command station](docs/images/asteria-command-station.png)
 
+## Demo Video
+
+[![Watch the Asteria demo](https://img.youtube.com/vi/D1TDQfpEP5k/hqdefault.jpg)](https://youtu.be/D1TDQfpEP5k)
+
+A short demo of Asteria, a local command station that connects AI agents, a VEX AIM robot, FSM demos, vision capture, and a handheld Asteria DS controller through one safer daemon-centered workflow. The demo is under seven minutes.
+
 ## What It Shows
 
 - A robotics daemon that keeps robot status, control leases, command dispatch, prompt logs, FSM files, image capture, and mobile sessions in one local runtime.
