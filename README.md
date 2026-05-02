@@ -113,3 +113,7 @@ Use this repo with the paired public handheld client:
 - [RedLynx101/asteria-ds](https://github.com/RedLynx101/asteria-ds)
 
 Asteria DS talks to this daemon over the authenticated mobile bridge and can submit prompts, claim teleop, send motion vectors, request stops, and show low-bandwidth camera previews.
+
+## License
+
+MIT License. See `LICENSE`.
