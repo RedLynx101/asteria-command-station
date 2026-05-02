@@ -102,6 +102,10 @@ The optional OpenClaw gateway integration is supported through environment varia
 
 Start with `wiki/index.md`. The wiki is part of the operating model: it captures validated runtime behavior, FSM conventions, safety semantics, recovery notes, and source provenance for future agents.
 
+## Contributing
+
+I am open to collaboration on Asteria. Useful contributions include FSM demos, GUI polish, safer agent workflows, classroom-friendly docs, bug reports, and experiments that make robot/agent coordination easier to understand. See `CONTRIBUTING.md` for the working guidelines.
+
 ## Repository Pair
 
 Use this repo with the paired public handheld client:
